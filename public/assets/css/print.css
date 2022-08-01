@@ -1,0 +1,62 @@
+.img-cart {
+    max-width: 30%;
+    max-height: 30%;
+}
+
+.count-order {
+    border-radius: 50%;
+    padding: 0 5px;
+    font-weight: 700;
+    background-color: red;
+}
+
+@media (max-width: 767px) {
+    .non-mobile {
+        display: none;
+    }
+}
+
+.shipping {
+    margin: 40px;
+    max-width: 70%;
+    height: 100%;
+    border: 1px dashed black;
+    font-size: 24px;
+}
+
+.shipping .logo {
+    border-bottom: 2px solid black;
+    margin-bottom: 10px;
+    width: auto;
+}
+
+.shipping .logo img {
+    max-width: 200px;
+}
+
+.shipping .logo .text {
+    vertical-align: middle;
+    text-align: right;
+    width: 100%;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.shipping .pembatas {
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    /* height: 20px; */
+    width: 100%;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.shipping .kolom-resi {
+    border: 1px solid black;
+    border-radius: 5px;
+    margin: 20px;
+    padding: 10px;
+    width: auto;
+    height: 100px;
+}
