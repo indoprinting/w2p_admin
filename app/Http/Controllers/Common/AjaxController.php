@@ -30,7 +30,7 @@ class AjaxController extends Controller
 
     public function notifGosend()
     {
-        $count  = Shipping::whereHas('order', fn ($query) => $query->whereIn('payment_status', ['Paid', 'Partial']))->where(['terkirim' => 0, 'courier_name' => 'Gosend'])->count();
+        $count  = Shipping::whereHas('order', fn ($query) => $query->whereIn('payment_status', ['Paid', 'Partial']))->where(['resi' => NULL, 'courier_name' => 'Gosend'])->count();
         return response()->json(['count' => $count]);
     }
 
