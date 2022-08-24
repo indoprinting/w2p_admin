@@ -23,6 +23,7 @@ class PeformanceOnlineController extends Controller
         $month  = $request->month ?? date('Y-m');
         $days   = Carbon::create($month)->daysInMonth;
         $day    = $month != date('Y-m') ? $days : Carbon::now()->isoFormat('D');
+        $day--; // Fix request from FUCKED raharjo.
         $title  = "Peformance Tim Online " . Carbon::create($month)->isoFormat('MMMM Y');
         $target = optional(DB::table('adm_target')->where('created_at', $month)->first());
         $orders = $this->model_order->queryRecap($month)->selectRaw('DAY(created_at) as day, sum(total+IFNULL(courier_price, 0)) as revenue, count(id_order) as transaction')->leftJoin('idp_delivery', 'idp_delivery.id_inv', '=', 'idp_orders.id_order')->oldest('day')->groupBy('day')->get();
