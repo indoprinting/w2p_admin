@@ -46,12 +46,12 @@ class AjaxController extends Controller
         $users  = collect($this->model_erp->getOperator())->where('warehouse_id', $id);
         foreach ($users as $user) :
             echo "<option value=''></option>";
-            echo "<option value='$user->id'>$user->first_name $user->last_name</option>";
+            echo "<option value='$user->id'>$user->fullname</option>";
         endforeach;
 
         $users  = collect($this->model_erp->getTL())->where('warehouse_id', $id);
         foreach ($users as $user) :
-            echo "<option value='$user->id'>$user->first_name $user->last_name</option>";
+            echo "<option value='$user->id'>$user->fullname</option>";
         endforeach;
     }
 

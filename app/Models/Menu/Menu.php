@@ -14,7 +14,8 @@ class Menu extends Model
 
     public function getMenu()
     {
-        return cache()->rememberForever('semua_menu', fn () => Menu::with('category')->latest('id')->get());
+        // return cache()->rememberForever('semua_menu', fn () => Menu::with('category')->latest('id')->get());
+        return cache()->remember('semua_menu', cacheTime(), fn () => Menu::with('category')->latest('id')->get());
     }
 
     public function category()

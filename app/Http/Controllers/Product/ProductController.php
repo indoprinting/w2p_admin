@@ -287,9 +287,9 @@ class ProductController extends Controller
         return back()->with('success', 'Berhasil duplicate produk');
     }
 
-    public function syncProductERP()
+    public function syncProductERP($id = NULL)
     {
-        $sync = $this->erp_model->syncProduct();
+        $this->erp_model->syncProduct($id);
         return back()->with('success', 'Sinkronisasi produk selesai');
     }
 

@@ -1,6 +1,7 @@
 @extends('layouts.main')
 @section('main')
     @php
+    if ($day == 0) $day++;
     $forecast = ($order->revenue / $day) * $days;
     $target_revenue = $target->revenue ?? 0;
     $forecast_transaction = $target_revenue == 0 ? 0 : $forecast / $target_revenue;
@@ -76,6 +77,15 @@
                                 <td></td>
                                 <td></td>
                             </tr>
+                            <tr>
+                                <th>Total Template</th>
+                                <td>
+                                    <x-input name="template" value="{{ $target->template ?? 0 }}" />
+                                </td>
+                                <td>{{ $template }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
                         </tbody>
                     </table>
                 </form>
@@ -84,7 +94,7 @@
                 <table class="table table-bordered" style="width: auto;">
                     <thead>
                         <tr>
-                            <th>Hari</th>
+                            <th>Tanggal</th>
                             @foreach ($orders as $day)
                                 <th>{{ $day['day'] }}</th>
                             @endforeach
@@ -116,6 +126,25 @@
                                     $zero = true;
                                 @endphp
                                 @foreach ($products as $product)
+                                    @if ($product->day == $day['day'])
+                                        <td>{{ $product->product }}</td>
+                                        @php
+                                            $zero = false;
+                                        @endphp
+                                    @endif
+                                @endforeach
+                                @if ($zero)
+                                    <td>0</td>
+                                @endif
+                            @endforeach
+                        </tr>
+                        <tr>
+                            <th>Template/hari</th>
+                            @foreach ($orders as $i => $day)
+                                @php
+                                    $zero = true;
+                                @endphp
+                                @foreach ($templates as $product)
                                     @if ($product->day == $day['day'])
                                         <td>{{ $product->product }}</td>
                                         @php

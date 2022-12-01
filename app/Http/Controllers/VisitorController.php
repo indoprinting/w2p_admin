@@ -11,7 +11,7 @@ class VisitorController extends Controller
     {
         $title      = "Semua Visitor";
         $date       = $request->date ?? date('Y-m');
-        $visitors   = DB::table('idp_visitor')->where('created_at', 'like', $date . '%')->get();
+        $visitors   = DB::table('idp_visitor')->where('created_at', 'like', $date . '%')->orderBy('id', 'desc')->get();
         $pc         = DB::table('idp_visitor')->where('is_mobile', 0)->count('is_mobile');
         $mobile     = DB::table('idp_visitor')->where('is_mobile', 1)->count('is_mobile');
 

@@ -20,7 +20,7 @@ class PriceListController extends Controller
     {
         $img        = $request->file;
         $fileName   = $img->getClientOriginalName();
-        $img->move(public_path("images/price-list"), $fileName);
+        $img->move(public_path("assets/images/price-list"), $fileName);
         DB::table('idp_price_list')->insert([
             'filename'  => $fileName
         ]);

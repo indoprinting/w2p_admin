@@ -14,8 +14,14 @@ class AdminController extends Controller
     public function index()
     {
         $title  = "List Admin";
-        $admins = User::where('role', '!=', 1)->get();
-        $roles  = DB::table('idp_user_role')->whereNotIn('id', [1, 2])->get();
+
+        if (Auth()->user()->role == 1) {
+            $admins = User::get();
+            $roles  = DB::table('idp_user_role')->get();
+        } else {
+            $admins = User::where('role', '!=', 1)->get();
+            $roles  = DB::table('idp_user_role')->whereNotIn('id', [1, 2])->get();
+        }
 
         return view('developer.admin.index_admin', compact('title', 'admins', 'roles'));
     }
@@ -34,12 +40,17 @@ class AdminController extends Controller
 
     public function update($id, AdminRequest $request)
     {
-        User::where('id', $id)->update([
+        $data = [
             'name'      => $request->name,
             'username'  => $request->username,
-            'role'      => $request->role,
-            'password'  => Hash::make($request->password)
-        ]);
+            'role'      => $request->role
+        ];
+
+        if (!empty($request->password)) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        User::where('id', $id)->update($data);
 
         return back()->with('success', 'Berhasil update admin');
     }

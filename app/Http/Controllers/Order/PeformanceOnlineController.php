@@ -32,8 +32,10 @@ class PeformanceOnlineController extends Controller
         $visit  = DB::table('idp_visitor_today')->where('created_at', 'like', "$month%")->selectRaw("count(id) as visitor, count(id)/$day as avg_visitor")->first();
         $products = Product::query()->where('created_at', 'like', "$month%")->selectRaw('DAY(created_at) as day, count(id_product) as product')->oldest('day')->groupBy('day')->get();
         $product  = Product::query()->count('id_product');
+        $templates = DB::table('nsm_products')->where('created', 'like', "$month%")->selectRaw('DAY(created) as day, count(id) as product')->oldest('day')->groupBy('day')->get();
+        $template  = DB::table('nsm_products')->where('active', 1)->count('id');
 
-        return view('perform_online.index', compact('title', 'orders', 'order', 'visits', 'visit', 'product', 'products', 'days', 'day', 'target'));
+        return view('perform_online.index', compact('title', 'orders', 'order', 'visits', 'visit', 'product', 'products', 'template', 'templates', 'days', 'day', 'target'));
     }
 
     public function setTarget(Request $request)
@@ -45,7 +47,8 @@ class PeformanceOnlineController extends Controller
                 'revenue'       => preg_replace('/[^0-9]/', '', $request->revenue),
                 'transaction'   => $request->transaction,
                 'visitor'       => $request->visitor,
-                'product'       => $request->product
+                'product'       => $request->product,
+                'template'     => $request->template
             ]
         );
 
@@ -60,7 +63,7 @@ class PeformanceOnlineController extends Controller
         $id     = $cs[0] ?? Auth::user()->id;
         $name   = $cs[1] ?? Auth::user()->name;
         $chart  = $this->model_order->queryRecap($month)
-            ->when(in_array($id, [9, 12, 13, 27]), function ($query, $id) use ($name) {
+            ->when(in_array($id, [9, 12, 13, 27, 324]), function ($query, $id) use ($name) {
                 return $query->where('cs', 'like', "%$name%");
             })->selectRaw('DAY(created_at) as label, sum(total+IFNULL(courier_price, 0)) as y, count(id_order) as jmlh_order')
             ->leftJoin('idp_delivery', 'idp_delivery.id_inv', '=', 'idp_orders.id_order')
@@ -85,7 +88,12 @@ class PeformanceOnlineController extends Controller
             ->selectRaw('DAY(created_at) as label, sum(total+IFNULL(courier_price, 0)) as y, count(id_order) as jmlh_order')
             ->leftJoin('idp_delivery', 'idp_delivery.id_inv', '=', 'idp_orders.id_order')
             ->oldest('label')->groupBy('label')->get()->toJson(JSON_NUMERIC_CHECK);
+        $chart_dyah  = $this->model_order->queryRecap($month)
+            ->where('cs', 'Dyah Arika Putri')
+            ->selectRaw('DAY(created_at) as label, sum(total+IFNULL(courier_price, 0)) as y, count(id_order) as jmlh_order')
+            ->leftJoin('idp_delivery', 'idp_delivery.id_inv', '=', 'idp_orders.id_order')
+            ->oldest('label')->groupBy('label')->get()->toJson(JSON_NUMERIC_CHECK);
 
-        return view('recap_monthly.rekap_online', compact('title', 'chart', 'chart_eric', 'chart_agung', 'chart_david'));
+        return view('recap_monthly.rekap_online', compact('title', 'chart', 'chart_eric', 'chart_agung', 'chart_david', 'chart_dyah'));
     }
 }

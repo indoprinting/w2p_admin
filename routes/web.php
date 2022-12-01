@@ -135,7 +135,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('product', ProductController::class)->names('product');
     Route::get('create-product-book', [ProductController::class, 'create'])->name('product.book');
     Route::get('create-product-sticker', [ProductController::class, 'create'])->name('product.sticker');
-    Route::get('sync-product', [ProductController::class, 'syncProductERP'])->name('product.sync');
+    Route::get('sync-product/{id}', [ProductController::class, 'syncProductERP'])->name('product.sync');
     Route::get('duplicate-product/{id}', [ProductController::class, 'duplicate'])->name('product.duplicate');
     Route::get('set-product', [ProductController::class, 'activeProduct'])->name('product.active');
     Route::get('export-product', [ProductController::class, 'exportProduct'])->name('product.export');

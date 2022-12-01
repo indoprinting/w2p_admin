@@ -46,7 +46,7 @@ class Product extends Model
                 'tinggi'        => $request->tinggi,
                 'customize'     => $request->customize ?? 0,
                 'luas'          => $request->luas ?? 0,
-                'luas'          => $request->mmt_fixed ?? 0,
+                'mmt_fixed'     => $request->mmt_fixed ?? 0,
                 'thumbnail'     => $thumbnail,
                 'min_price'     => $bahan['material_min_price'],
                 'thumbnail2'    => $thumbnail2,

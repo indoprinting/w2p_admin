@@ -11,6 +11,7 @@ class DeveloperController extends Controller
     public function clearCache()
     {
         DB::table('adm_cache')->whereNotIn('key', ['cache_warehouse_erp'])->delete();
+        cache()->delete('list-cs');
         return back();
     }
 

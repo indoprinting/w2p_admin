@@ -26,8 +26,7 @@ class AdminRequest extends FormRequest
         // dd($this->route());
         return [
             'name'      => 'string',
-            'username'  => "required|unique:idp_admin,username,{$this->id}",
-            'password'  => "required|confirmed"
+            'username'  => "required|unique:idp_admin,username,{$this->id}"
         ];
     }
 }

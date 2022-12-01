@@ -220,32 +220,70 @@
                         </tbody>
                     @endforeach
                 </table> --}}
-                @foreach (json_decode($order->items) as $cart)
-                    <table class="table table-borderless" style="border: 1px dashed black;width:100%;margin:10px 0;padding:5px">
-                        @foreach (json_decode($cart->attributes)->jenis_atb as $id => $jenis_atb)
+                @if(!intval($order->items))
+                    @foreach (json_decode($order->items) as $cart)
+                        <table class="table table-borderless" style="border: 1px dashed black;width:100%;margin:10px 0;padding:5px">
+                            @foreach (json_decode($cart->attributes)->jenis_atb as $id => $jenis_atb)
+                                <tr>
+                                    <td class="text-bold">{{ $jenis_atb }}</td>
+                                    <td>:</td>
+                                    <td>{{ json_decode($cart->attributes, true)['nama_atb'][$id] }}</td>
+                                </tr>
+                            @endforeach
                             <tr>
-                                <td class="text-bold">{{ $jenis_atb }}</td>
+                                <td class="text-bold">Qty</td>
                                 <td>:</td>
-                                <td>{{ json_decode($cart->attributes, true)['nama_atb'][$id] }}</td>
+                                <td>{{ $cart->qty }}</td>
                             </tr>
-                        @endforeach
-                        <tr>
-                            <td class="text-bold">Qty</td>
-                            <td>:</td>
-                            <td>{{ $cart->qty }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-bold">Harga</td>
-                            <td>:</td>
-                            <td>{{ rupiah($cart->price) }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-bold">Item note</td>
-                            <td>:</td>
-                            <td>{!! $cart->product_note !!}</td>
-                        </tr>
-                    </table>
-                @endforeach
+                            <tr>
+                                <td class="text-bold">Harga</td>
+                                <td>:</td>
+                                <td>{{ rupiah($cart->price) }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-bold">Item note</td>
+                                <td>:</td>
+                                <td>{!! $cart->product_note !!}</td>
+                            </tr>
+                        </table>
+                    @endforeach
+                @else
+                    <?php
+                        $design_id = $_SERVER["REQUEST_URI"];
+                        $id_design = $_GET['invoice'];
+                        $database = \Illuminate\Support\Facades\DB::table('idp_orders')
+                            ->join('nsm_order_products', 'nsm_order_products.id', '=', 'idp_orders.items')
+                            ->join('nsm_orders', 'nsm_orders.id', '=', 'nsm_order_products.order_id')
+                            ->join('nsm_guests', 'nsm_guests.id', '=', 'nsm_orders.user_id')
+                            ->where('idp_orders.no_inv', $id_design)
+                            ->get()
+                        ;
+                    ?>
+                    @foreach ($database as $data)
+                            <?php
+                            $invoices = \Illuminate\Support\Facades\DB::table('nsm_order_products')
+                                ->join('nsm_orders', 'nsm_orders.id', '=', 'nsm_order_products.order_id')
+                                ->join('nsm_guests', 'nsm_guests.id', '=', 'nsm_orders.user_id')
+                                ->where('nsm_order_products.order_id', $data->order_id)
+                                ->get()
+                            ;
+                            ?>
+                        @foreach ($invoices as $cart)
+                        <table class="table table-borderless" style="border: 1px dashed black;width:100%;margin:10px 0;padding:5px">
+                            <tr>
+                                <td class="text-bold">Nama Produk</td>
+                                <td>:</td>
+                                <td>{{ $cart->product_name  }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-bold">Harga</td>
+                                <td>:</td>
+                                <td>{{ rupiah($cart->product_price)  }}</td>
+                            </tr>
+                        </table>
+                    @endforeach
+                    @endforeach
+                @endif
                 <div class="hr"></div>
                 <div>
                     <strong>Total Belanja</strong>

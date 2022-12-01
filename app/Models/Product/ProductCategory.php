@@ -14,6 +14,7 @@ class ProductCategory extends Model
 
     public function getCategory()
     {
-        return cache()->rememberForever('category-product', fn () => ProductCategory::get());
+        // return cache()->rememberForever('category-product', fn () => ProductCategory::get());
+        return cache()->remember('category-product', cacheTime(), fn () => ProductCategory::get());
     }
 }

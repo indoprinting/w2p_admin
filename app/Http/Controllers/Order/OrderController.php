@@ -25,11 +25,11 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-        $title  = "Semua Transaksi";
-        $status = $request->status;
-        $date1  = $request->date1 ?? Carbon::now()->subDays(30);
-        $date2  = $request->date2 ?? Carbon::now();
-        $orders = Order::whereBetween('created_at', [$date1, $date2])->when($status, fn ($query, $status) => $query->where('sale_status', $status))->latest('created_at')->get();
+        $title   = "Semua Transaksi";
+        $status  = $request->status;
+        $date1   = $request->date1 ?? Carbon::now()->subDays(30);
+        $date2   = $request->date2 ?? Carbon::now();
+        $orders  = Order::whereBetween('created_at', [$date1, $date2])->when($status, fn ($query, $status) => $query->where('sale_status', $status))->latest('created_at')->get();
 
         return view('order.index_order', compact('title', 'orders'));
     }
@@ -43,8 +43,17 @@ class OrderController extends Controller
         $operators  = collect($this->model_erp->getOperator());
         if (!$sale_erp) return back()->with('error', 'Nota di print erp tidak ditemukan');
         $warehouses = DB::table('adm_warehouses')->get();
+        $design_id = $_SERVER["REQUEST_URI"];
+        $id_design = basename($design_id);
+        $designs = DB::table('idp_orders')
+            ->join('nsm_order_products', 'nsm_order_products.id', '=', 'idp_orders.items')
+            ->join('nsm_orders', 'nsm_orders.id', '=', 'nsm_order_products.order_id')
+            ->join('nsm_guests', 'nsm_guests.id', '=', 'nsm_orders.user_id')
+            ->where('idp_orders.id_order', $id_design)
+            ->get()
+        ;
 
-        return view('order.detail_order', compact('title', 'order', 'sale_erp', 'warehouses', 'operators', 'tl_erp', 'cs_erp'));
+        return view('order.detail_order', compact('title', 'order', 'sale_erp', 'warehouses', 'operators', 'tl_erp', 'cs_erp', 'designs'));
     }
 
     public function updateInvoice(OrderRequest $request)

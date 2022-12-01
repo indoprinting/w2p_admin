@@ -18,7 +18,8 @@ class CustomerController extends Controller
         $date1      = $request->date1 ?? Carbon::now()->startOfMonth()->toDate();
         $date2      = $request->date2 ?? Carbon::now()->toDate();
         $condition  = fn ($query) => $query->where('payment_status', 'Paid');
-        $customers  = Customer::withCount(['order' => $condition])->withSum(['order' => $condition], 'total')->whereBetween('created_at', [$date1, $date2])->latest()->get();
+        // $customers  = Customer::withCount(['order' => $condition])->withSum(['order' => $condition], 'total')->whereBetween('created_at', [$date1, $date2])->latest()->get();
+        $customers  = Customer::withCount(['order' => $condition])->withSum(['order' => $condition], 'total')->get();
         return view('customer.index_customer', compact('title', 'customers'));
     }
 

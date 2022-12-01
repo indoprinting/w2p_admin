@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Order\Order;
 use App\Models\Product\Product;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,18 @@ class PrintERP extends Model
         $this->api_erp  = Http::withOptions(['http_errors' => false])->baseUrl("https://printerp.indoprinting.co.id/api/v1/");
     }
 
+    public function getDesigns($id)
+    {
+        DB::table('idp_orders')
+            ->join('nsm_order_products', 'nsm_order_products.id', '=', 'idp_orders.items')
+            ->join('nsm_orders', 'nsm_orders.id', '=', 'nsm_order_products.order_id')
+            ->join('nsm_guests', 'nsm_guests.id', '=', 'nsm_orders.user_id')
+            ->where('idp_orders.id_order', $id)
+            ->get()
+        ;
+        return false;
+    }
+
     public function getSale($invoice)
     {
         $api_sale = $this->api_erp->get('sales', ['invoice' => $invoice])->object();
@@ -29,12 +42,16 @@ class PrintERP extends Model
 
     public function getTL()
     {
-        return cache()->rememberForever('list-tl', fn () => $this->api_erp->get('users', ['group' => 'tl'])->object()->users);
+        // return cache()->rememberForever('list-tl', fn () => $this->api_erp->get('users', ['group' => 'tl'])->object()->users);
+        // return cache()->remember('list-tl', cacheTime(), fn () => $this->api_erp->get('users', ['group' => 'tl'])->object()->users);
+        return $this->api_erp->get('users', ['group' => 'tl'])->object()->users;
     }
 
     public function getCS()
     {
-        return cache()->rememberForever('list-cs', fn () => $this->api_erp->get('users', ['group' => 'cs'])->object()->users);
+        // return cache()->rememberForever('list-cs', fn () => $this->api_erp->get('users', ['group' => 'cs'])->object()->users);
+        // return cache()->remember('list-cs', cacheTime(), fn () => $this->api_erp->get('users', ['group' => 'cs'])->object()->users);
+        return $this->api_erp->get('users', ['group' => 'cs'])->object()->users;
     }
 
     public function approvedInvoice($invoice)
@@ -52,14 +69,13 @@ class PrintERP extends Model
 
     public function getOperator()
     {
-        return cache()->rememberForever('list-operator', fn () => $this->api_erp->get('users', ['group' => 'operator'])->object()->users);
+        // return cache()->rememberForever('list-operator', fn () => $this->api_erp->get('users', ['group' => 'operator'])->object()->users);
+        return cache()->remember('list-operator', cacheTime(), fn () => $this->api_erp->get('users', ['group' => 'operator'])->object()->users);
     }
 
     public function getWarehouse()
     {
-        return cache()->remember('warehouse_erp', cacheTime(), function () {
-            return $this->api_erp->get('warehouses')->object()->data;
-        });
+        return cache()->remember('warehouse_erp', cacheTime(), fn () => $this->api_erp->get('warehouses')->object()->data);
     }
 
     public function editSale($request)
@@ -68,6 +84,7 @@ class PrintERP extends Model
         $warehouse  = $request->warehouse;
         $inv        = $request->invoice;
         $order      = Order::where('no_inv', $inv)->first();
+
         try {
             $this->api_erp->asForm()->post('sales/edit', [
                 'invoice'   => $inv,
@@ -91,6 +108,7 @@ class PrintERP extends Model
         }
 
         return Order::where('no_inv', $inv)->update([
+            'cs'        => $request->cs,
             'message'   => $request->message,
             'proced'    => 1
         ]);
@@ -98,7 +116,7 @@ class PrintERP extends Model
 
     public function getProduct()
     {
-        return cache()->rememberForever('product_erp', function () {
+        return cache()->remember('product_erp', cacheTime(), function () {
             return $this->api_erp->get('products')->object()->products;
         });
     }
@@ -195,11 +213,15 @@ class PrintERP extends Model
         }
     }
 
-    public function syncProduct($id = null)
+    public function syncProduct($productId = null)
     {
         $products        = Product::all();
         // dd($products);
         foreach ($products as $product) :
+            if ($productId) {
+                if ($product->id_product != $productId) continue;
+            }
+
             try {
                 $id             = $product->id_product;
                 $attributes     = json_decode($product->attributes['attributes']);
